@@ -10,6 +10,11 @@ class AuthWidget extends StatefulWidget {
 class _AuthWidgetState extends State<AuthWidget> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Login to your account'),
+        centerTitle: true,
+      ),
+    );
   }
 }
