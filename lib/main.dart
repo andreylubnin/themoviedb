@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
               const AppBarTheme(backgroundColor: Color.fromRGBO(3, 37, 65, 1))),
       routes: {
         '/auth': (context) => const AuthWidget(),
+        // '/main_screen': (context) => const ExampleWidget(),
         '/main_screen': (context) => const MainScreenWidget(),
       },
       initialRoute: '/auth',
@@ -37,5 +38,34 @@ class MyApp extends StatelessWidget {
         });
       },
     );
+  }
+}
+
+class ExampleWidget extends StatefulWidget {
+  const ExampleWidget({Key? key}) : super(key: key);
+
+  @override
+  _ExampleWidgetState createState() => _ExampleWidgetState();
+}
+
+class _ExampleWidgetState extends State<ExampleWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('TMDB'),
+          centerTitle: true,
+        ),
+        body: Center(
+          child: ElevatedButton(
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop;
+              }
+              ;
+            },
+            child: Text('Жми'),
+          ),
+        ));
   }
 }
