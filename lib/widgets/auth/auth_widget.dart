@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:themoviedb/Theme/app_button_style.dart';
-import 'package:themoviedb/widgets/main_screen/main_screen_widget.dart';
 
 class AuthWidget extends StatefulWidget {
   const AuthWidget({Key? key}) : super(key: key);
@@ -14,11 +13,11 @@ class _AuthWidgetState extends State<AuthWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login to your account'),
+        title: const Text('Login to your account'),
         centerTitle: true,
       ),
       body: ListView(
-        children: [
+        children: const [
           _HeaderWidget(),
         ],
       ),
