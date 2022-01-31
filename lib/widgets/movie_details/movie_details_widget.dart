@@ -17,7 +17,7 @@ class _MovieDetailsWidgetState extends State<MovieDetailsWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tom Clansy`s Without Remorse'),
+        title: const Text('Tom Clancy`s Without Remorse'),
         centerTitle: true,
       ),
       body: ColoredBox(
