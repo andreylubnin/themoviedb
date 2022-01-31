@@ -29,7 +29,7 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
       body: Center(
         child: IndexedStack(
           index: _selectedTab,
-          children: [
+          children: const [
             Text('Новости'),
             MovieListWidget(),
             Text('Сериалы'),

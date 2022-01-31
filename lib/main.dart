@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
           if (arguments is int) {
             return MovieDetailsWidget(movieId: arguments);
           } else {
-            return MovieDetailsWidget(movieId: 1);
+            return const MovieDetailsWidget(movieId: 1);
           }
         },
       },
