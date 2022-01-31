@@ -150,7 +150,8 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                           color: Colors.white,
                           border:
                               Border.all(color: Colors.black.withOpacity(0.2)),
-                          borderRadius: const BorderRadius.all(Radius.circular(8)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(8)),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.1),
@@ -170,7 +171,8 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                                 const SizedBox(height: 20),
                                 Text(
                                   movie.title,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
