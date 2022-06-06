@@ -6,8 +6,8 @@ import 'package:themoviedb/ui/widgets/movie_details/movie_details_widget.dart';
 
 class MainNavigationRouteNames {
   static const auth = 'auth';
-  static const mainScreen = '/main_screen';
-  static const movieDetails = '/main_screen/movie_details';
+  static const mainScreen = '/';
+  static const movieDetails = '/movie_details';
 }
 
 class MainNavigation {
@@ -15,11 +15,11 @@ class MainNavigation {
       ? MainNavigationRouteNames.mainScreen
       : MainNavigationRouteNames.auth;
   final routes = <String, Widget Function(BuildContext context)>{
-    '/auth': (context) => AuthProvider(
+    MainNavigationRouteNames.auth: (context) => AuthProvider(
           model: AuthModel(),
           child: const AuthWidget(),
         ),
-    '/main_screen': (context) => const MainScreenWidget(),
+    MainNavigationRouteNames.mainScreen: (context) => const MainScreenWidget(),
   };
 
   Route<Object> onGenerateRoute(RouteSettings settings) {

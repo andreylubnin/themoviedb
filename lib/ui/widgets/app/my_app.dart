@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:themoviedb/ui/Theme/app_colors.dart';
 import 'package:themoviedb/ui/navigation/main_navigation.dart';
+import 'package:themoviedb/ui/widgets/app/my_app_model.dart';
 
 class MyApp extends StatelessWidget {
+  final MyAppModel model;
   static final mainNavigation = MainNavigation();
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({Key? key, required this.model}) : super(key: key);
 
   // This widget is the root of your application.
   @override
@@ -23,7 +25,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       routes: mainNavigation.routes,
-      initialRoute: mainNavigation.initialRoute(false),
+      initialRoute: mainNavigation.initialRoute(model.isAuth),
       onGenerateRoute: mainNavigation.onGenerateRoute,
     );
   }
