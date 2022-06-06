@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:themoviedb/Theme/app_button_style.dart';
+import 'package:themoviedb/ui/theme/app_button_style.dart';
+import 'package:themoviedb/ui/widgets/auth/auth_model.dart';
 
 class AuthWidget extends StatefulWidget {
   const AuthWidget({Key? key}) : super(key: key);
@@ -30,7 +31,10 @@ class _HeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const textStyle = TextStyle(fontSize: 16.0, color: Colors.black);
+    const textStyle = TextStyle(
+      fontSize: 16.0,
+      color: Colors.black,
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
@@ -69,90 +73,120 @@ class _HeaderWidget extends StatelessWidget {
   }
 }
 
-class _FormWidget extends StatefulWidget {
+class _FormWidget extends StatelessWidget {
   const _FormWidget({Key? key}) : super(key: key);
 
   @override
-  __FormWidgetState createState() => __FormWidgetState();
-}
-
-class __FormWidgetState extends State<_FormWidget> {
-  final _loginTextController = TextEditingController(text: 'admin');
-  final _passwordTextController = TextEditingController(text: 'admin');
-
-  String? errorText;
-
-  void _auth() {
-    final login = _loginTextController.text;
-    final password = _passwordTextController.text;
-
-    if (login == 'admin' && password == 'admin') {
-      errorText = null;
-      // print('Open app');
-      Navigator.of(context).pushReplacementNamed('/main_screen');
-    } else {
-      errorText = 'Неверный логин или пароль';
-      // print('show error');
-    }
-    setState(() {});
-  }
-
-  void _resetPassword() {
-    // print('reset passwword');
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final model = AuthProvider.read(context)?.model;
     const textStyle = TextStyle(
       fontSize: 16,
       color: Color(0xFF212529),
     );
-    const textFieldBorderColor = Color(0xFF01B4E4);
     const textFieldDecoration = InputDecoration(
-      border: OutlineInputBorder(
-          borderSide: BorderSide(color: textFieldBorderColor)),
+      border: OutlineInputBorder(),
+      // 01B4E4
       contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       isCollapsed: true,
-
-      // 01B4E4
+      fillColor: Colors.red,
+      focusColor: Colors.red,
+      hoverColor: Colors.red,
     );
-    final errorText = this.errorText;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (errorText != null)
-          Text(errorText, style: const TextStyle(color: Colors.red)),
-        const Text('Имя пользователя', style: textStyle),
+        const _ErrorMessageWidget(),
+        const Text(
+          'Имя пользователя',
+          style: textStyle,
+        ),
         const SizedBox(height: 5),
         TextField(
-          controller: _loginTextController,
+          controller: model?.loginTextController,
           decoration: textFieldDecoration,
         ),
         const SizedBox(height: 20),
-        const Text('Пароль', style: textStyle),
+        const Text(
+          'Пароль',
+          style: textStyle,
+        ),
         const SizedBox(height: 5),
         TextField(
-          controller: _passwordTextController,
+          controller: model?.passwordTextController,
           decoration: textFieldDecoration,
           obscureText: true,
         ),
         const SizedBox(height: 25),
         Row(
           children: [
-            ElevatedButton(
-              onPressed: _auth,
-              style: AppButtonStyle.mainButton,
-              child: const Text('Войти'),
-            ),
+            const _AuthButtonWidget(),
             const SizedBox(width: 30),
             TextButton(
-              onPressed: _resetPassword,
+              onPressed: () {},
               style: AppButtonStyle.linkButton,
               child: const Text('Сбросить пароль'),
             ),
           ],
         )
       ],
+    );
+  }
+}
+
+class _AuthButtonWidget extends StatelessWidget {
+  const _AuthButtonWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final model = AuthProvider.watch(context)?.model;
+    const color = Color(0xFF01B4E4);
+    final onPressed =
+        model?.canStartAuth == true ? () => model?.auth(context) : null;
+    final child = model?.isAuthProgress == true
+        ? const SizedBox(
+            width: 15,
+            height: 15,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+        : const Text('Войти');
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(color),
+        foregroundColor: MaterialStateProperty.all(Colors.white),
+        textStyle: MaterialStateProperty.all(
+          const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+        ),
+        padding: MaterialStateProperty.all(
+          const EdgeInsets.symmetric(
+            horizontal: 15,
+            vertical: 8,
+          ),
+        ),
+      ),
+      child: child,
+    );
+  }
+}
+
+class _ErrorMessageWidget extends StatelessWidget {
+  const _ErrorMessageWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final errorMessage = AuthProvider.watch(context)?.model.errorMessage;
+    if (errorMessage == null) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Text(
+        errorMessage,
+        style: const TextStyle(
+          fontSize: 17,
+          color: Colors.red,
+        ),
+      ),
     );
   }
 }
