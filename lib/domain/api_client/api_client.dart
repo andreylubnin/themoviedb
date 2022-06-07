@@ -1,6 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+enum ApiClientExceptionType { Network, Auth, Other }
+
+class ApiClientException implements Exception {
+  final ApiClientExceptionType type;
+
+  ApiClientException(this.type);
+}
+
 class ApiClient {
   final _client = HttpClient();
   static const _host = 'https://api.themoviedb.org/3';
@@ -31,16 +39,48 @@ class ApiClient {
     }
   }
 
+  Future<T> _get<T>(
+    String path,
+    T Function(dynamic json) parser, [
+    Map<String, dynamic>? parameters,
+  ]) async {
+    final url = _makeUri(path, parameters);
+    try {
+      final request = await _client.getUrl(url);
+      final response = await request.close();
+      final dynamic json = (await response.jsonDecode());
+      _validateResponse(response, json);
+      final result = parser(json);
+      return result;
+    } on SocketException {
+      throw ApiClientException(ApiClientExceptionType.Network);
+    } on ApiClientException {
+      rethrow;
+    } catch (e) {
+      throw ApiClientException(ApiClientExceptionType.Other);
+    }
+  }
+
   Future<String> _makeToken() async {
-    final url = _makeUri(
+    final parser = (dynamic json) {};
+    final result = _get(
       '/authentication/token/new',
+      parser,
       <String, dynamic>{'api_key': _apiKey},
     );
-    final request = await _client.getUrl(url);
-    final response = await request.close();
-    final json = (await response.jsonDecode()) as Map<String, dynamic>;
-    final token = json['request_token'] as String;
-    return token;
+
+    try {
+      final json = (await response.jsonDecode()) as Map<String, dynamic>;
+      _validateResponse(response, json);
+      final token = json['request_token'] as String;
+      return token;
+    } on SocketException {
+      throw ApiClientException(ApiClientExceptionType.Network);
+    } on ApiClientException {
+      rethrow;
+    } catch (e) {
+      throw ApiClientException(ApiClientExceptionType.Other);
+    }
   }
 
   Future<String> _validateUser({
@@ -57,15 +97,24 @@ class ApiClient {
       'password': password,
       'request_token': requestToken,
     };
-    final request = await _client.postUrl(url);
+    try {
+      final request = await _client.postUrl(url);
 
-    request.headers.contentType = ContentType.json;
-    request.write(jsonEncode(parameters));
-    final response = await request.close();
-    final json = (await response.jsonDecode()) as Map<String, dynamic>;
+      request.headers.contentType = ContentType.json;
+      request.write(jsonEncode(parameters));
+      final response = await request.close();
+      final json = (await response.jsonDecode()) as Map<String, dynamic>;
+      _validateResponse(response, json);
 
-    final token = json['request_token'] as String;
-    return token;
+      final token = json['request_token'] as String;
+      return token;
+    } on SocketException {
+      throw ApiClientException(ApiClientExceptionType.Network);
+    } on ApiClientException {
+      rethrow;
+    } catch (e) {
+      throw ApiClientException(ApiClientExceptionType.Other);
+    }
   }
 
   Future<String> _makeSession({
@@ -78,15 +127,36 @@ class ApiClient {
     final parameters = <String, dynamic>{
       'request_token': requestToken,
     };
-    final request = await _client.postUrl(url);
+    try {
+      final request = await _client.postUrl(url);
 
-    request.headers.contentType = ContentType.json;
-    request.write(jsonEncode(parameters));
-    final response = await request.close();
-    final json = (await response.jsonDecode()) as Map<String, dynamic>;
+      request.headers.contentType = ContentType.json;
+      request.write(jsonEncode(parameters));
+      final response = await request.close();
+      final json = (await response.jsonDecode()) as Map<String, dynamic>;
+      _validateResponse(response, json);
 
-    final sessionId = json['session_id'] as String;
-    return sessionId;
+      final sessionId = json['session_id'] as String;
+      return sessionId;
+    } on SocketException {
+      throw ApiClientException(ApiClientExceptionType.Network);
+    } on ApiClientException {
+      rethrow;
+    } catch (e) {
+      throw ApiClientException(ApiClientExceptionType.Other);
+    }
+  }
+
+  void _validateResponse(HttpClientResponse response, dynamic json) {
+    if (response.statusCode == 401) {
+      final status = json['status_code'];
+      final code = status is int ? status : 0;
+      if (code == 30 || code == 32) {
+        throw ApiClientException(ApiClientExceptionType.Auth);
+      } else {
+        throw ApiClientException(ApiClientExceptionType.Other);
+      }
+    }
   }
 }
 

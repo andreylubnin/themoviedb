@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:themoviedb/domain/api_client/api_client.dart';
 import 'package:themoviedb/domain/data_providers/session_data_provider.dart';
 import 'package:flutter/material.dart';
@@ -36,8 +38,20 @@ class AuthModel extends ChangeNotifier {
         username: login,
         password: password,
       );
+    } on ApiClientException catch (e) {
+      switch (e.type) {
+        case ApiClientExceptionType.Network:
+          _errorMessage = 'Сервер недоступен. Проверьте подключение.';
+          break;
+        case ApiClientExceptionType.Auth:
+          _errorMessage = 'Неправильный логин или пароль!';
+          break;
+        case ApiClientExceptionType.Other:
+          _errorMessage = 'Что-то пошло не так. Попробуйте ещё раз';
+          break;
+      }
     } catch (e) {
-      _errorMessage = 'Неправильный логин или пароль!';
+      _errorMessage = 'Что-то пошло не так. Попробуйте ещё раз';
     }
     _isAuthProgress = false;
     if (_errorMessage != null) {
@@ -53,29 +67,5 @@ class AuthModel extends ChangeNotifier {
     await _sessionDataProvider.setSessionId(sessionId);
     unawaited(Navigator.of(context)
         .pushReplacementNamed(MainNavigationRouteNames.mainScreen));
-  }
-}
-
-class AuthProvider extends InheritedNotifier {
-  final AuthModel model;
-
-  const AuthProvider({
-    Key? key,
-    required this.model,
-    required Widget child,
-  }) : super(
-          key: key,
-          notifier: model,
-          child: child,
-        );
-
-  static AuthProvider? watch(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<AuthProvider>();
-  }
-
-  static AuthProvider? read(BuildContext context) {
-    final widget =
-        context.getElementForInheritedWidgetOfExactType<AuthProvider>()?.widget;
-    return widget is AuthProvider ? widget : null;
   }
 }
