@@ -40,13 +40,13 @@ class AuthModel extends ChangeNotifier {
       );
     } on ApiClientException catch (e) {
       switch (e.type) {
-        case ApiClientExceptionType.Network:
+        case ApiClientExceptionType.network:
           _errorMessage = 'Сервер недоступен. Проверьте подключение.';
           break;
-        case ApiClientExceptionType.Auth:
+        case ApiClientExceptionType.auth:
           _errorMessage = 'Неправильный логин или пароль!';
           break;
-        case ApiClientExceptionType.Other:
+        case ApiClientExceptionType.other:
           _errorMessage = 'Что-то пошло не так. Попробуйте ещё раз';
           break;
       }

@@ -65,9 +65,9 @@ class MyPainter extends CustomPainter {
     drawFilledArc(canvas, arcRect);
   }
 
-  void drawFilledArc(Canvas canvas, Rect arcRect) {
+  void drawFreeArc(Canvas canvas, Rect arcRect) {
     final paint = Paint();
-    paint.color = freeColor;
+    paint.color = lineColor;
     paint.style = PaintingStyle.stroke;
     paint.strokeWidth = lineWidth;
     paint.strokeCap = StrokeCap.round;
@@ -80,9 +80,9 @@ class MyPainter extends CustomPainter {
     );
   }
 
-  void drawFreeArc(Canvas canvas, Rect arcRect) {
+  void drawFilledArc(Canvas canvas, Rect arcRect) {
     final paint = Paint();
-    paint.color = lineColor;
+    paint.color = freeColor;
     paint.style = PaintingStyle.stroke;
     paint.strokeWidth = lineWidth;
     canvas.drawArc(

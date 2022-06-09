@@ -76,8 +76,8 @@ class _NewsWidgetPopularState extends State<NewsWidgetPopular> {
                           left: 10,
                           bottom: 0,
                           child: SizedBox(
-                            width: 40,
-                            height: 40,
+                            width: 45,
+                            height: 45,
                             child: RadialPercentWidget(
                               percent: 0.68,
                               fillColor: Color.fromARGB(255, 10, 23, 25),
