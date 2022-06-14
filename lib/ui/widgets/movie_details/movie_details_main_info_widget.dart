@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:themoviedb/resources/resources.dart';
+import 'package:themoviedb/domain/api_client/api_client.dart';
+import 'package:themoviedb/library/widgets/inherited/provider.dart';
 import 'package:themoviedb/ui/widgets/elements/radial_percent_widget.dart';
+import 'package:themoviedb/ui/widgets/movie_details/movie_details_model.dart';
 
 class MovieDetailsMainInfoWidget extends StatelessWidget {
   const MovieDetailsMainInfoWidget({Key? key}) : super(key: key);
@@ -142,17 +144,26 @@ class _TopPosterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: const [
-        Image(
-          image: AssetImage(AppImages.topHeader),
-        ),
-        Positioned(
-            top: 20,
-            left: 20,
-            bottom: 20,
-            child: Image(image: AssetImage(AppImages.topHeaderSubImage))),
-      ],
+    final _model = NotifierProvider.watch<MovieDetailsModel>(context);
+    final backdropPath = _model?.movieDetails?.backdropPath;
+    final posterPath = _model?.movieDetails?.posterPath;
+
+    return AspectRatio(
+      aspectRatio: 390 / 219,
+      child: Stack(
+        children: [
+          backdropPath != null
+              ? Image.network(ApiClient.imageUrl(backdropPath))
+              : const SizedBox.shrink(),
+          Positioned(
+              top: 20,
+              left: 20,
+              bottom: 20,
+              child: posterPath != null
+                  ? Image.network(ApiClient.imageUrl(posterPath))
+                  : const SizedBox.shrink()),
+        ],
+      ),
     );
   }
 }
@@ -162,17 +173,24 @@ class _MovieNameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RichText(
-      maxLines: 3,
-      textAlign: TextAlign.center,
-      text: const TextSpan(children: [
-        TextSpan(
-            text: 'Tom Clancy`s Without Remorse',
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17)),
-        TextSpan(
-            text: ' (2021)',
-            style: TextStyle(fontWeight: FontWeight.w400, fontSize: 16)),
-      ]),
+    final _model = NotifierProvider.watch<MovieDetailsModel>(context);
+    var _year = _model?.movieDetails?.releaseDate?.year.toString();
+    _year = _year != null ? ' ($_year)' : '';
+    return Center(
+      child: RichText(
+        maxLines: 3,
+        textAlign: TextAlign.center,
+        text: TextSpan(children: [
+          TextSpan(
+              text: _model?.movieDetails?.title ?? '',
+              style:
+                  const TextStyle(fontWeight: FontWeight.w600, fontSize: 17)),
+          TextSpan(
+              text: _year,
+              style:
+                  const TextStyle(fontWeight: FontWeight.w400, fontSize: 16)),
+        ]),
+      ),
     );
   }
 }
@@ -182,26 +200,32 @@ class _ScoreWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var _voteAverage = NotifierProvider.watch<MovieDetailsModel>(context)
+            ?.movieDetails
+            ?.voteAverage ??
+        0;
+    _voteAverage = _voteAverage * 10;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         TextButton(
           onPressed: () {},
           child: Row(
-            children: const [
+            children: [
               SizedBox(
                 width: 45,
                 height: 45,
                 child: RadialPercentWidget(
-                    percent: 0.72,
-                    fillColor: Color.fromARGB(255, 10, 23, 25),
-                    freeColor: Color.fromARGB(255, 37, 203, 103),
-                    lineColor: Color.fromARGB(255, 25, 54, 31),
+                    percent: _voteAverage / 100,
+                    fillColor: const Color.fromARGB(255, 10, 23, 25),
+                    freeColor: const Color.fromARGB(255, 37, 203, 103),
+                    lineColor: const Color.fromARGB(255, 25, 54, 31),
                     lineWidth: 3,
-                    child: Text('72', style: TextStyle(color: Colors.white))),
+                    child: Text(_voteAverage.toStringAsFixed(0),
+                        style: const TextStyle(color: Colors.white))),
               ),
-              SizedBox(width: 10),
-              Text('User Score'),
+              const SizedBox(width: 10),
+              const Text('User Score'),
             ],
           ),
         ),
