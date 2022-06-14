@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'popular_movie_response.dart';
+part of 'movie_list_response.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-PopularMovieResponse _$PopularMovieResponseFromJson(Map<String, dynamic> json) {
-  return PopularMovieResponse(
+MovieListResponse _$PopularMovieResponseFromJson(Map<String, dynamic> json) {
+  return MovieListResponse(
     page: json['page'] as int,
     movies: (json['results'] as List<dynamic>)
         .map((e) => Movie.fromJson(e as Map<String, dynamic>))
@@ -17,8 +17,7 @@ PopularMovieResponse _$PopularMovieResponseFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$PopularMovieResponseToJson(
-        PopularMovieResponse instance) =>
+Map<String, dynamic> _$PopularMovieResponseToJson(MovieListResponse instance) =>
     <String, dynamic>{
       'page': instance.page,
       'results': instance.movies.map((e) => e.toJson()).toList(),
