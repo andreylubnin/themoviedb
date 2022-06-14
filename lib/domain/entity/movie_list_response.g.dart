@@ -6,7 +6,7 @@ part of 'movie_list_response.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-MovieListResponse _$PopularMovieResponseFromJson(Map<String, dynamic> json) {
+MovieListResponse _$MovieListResponseFromJson(Map<String, dynamic> json) {
   return MovieListResponse(
     page: json['page'] as int,
     movies: (json['results'] as List<dynamic>)
@@ -17,7 +17,7 @@ MovieListResponse _$PopularMovieResponseFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$PopularMovieResponseToJson(MovieListResponse instance) =>
+Map<String, dynamic> _$MovieListResponseToJson(MovieListResponse instance) =>
     <String, dynamic>{
       'page': instance.page,
       'results': instance.movies.map((e) => e.toJson()).toList(),

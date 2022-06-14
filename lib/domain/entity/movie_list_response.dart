@@ -19,7 +19,7 @@ class MovieListResponse {
   });
 
   factory MovieListResponse.fromJson(Map<String, dynamic> json) =>
-      _$PopularMovieResponseFromJson(json);
+      _$MovieListResponseFromJson(json);
 
-  Map<String, dynamic> toJson() => _$PopularMovieResponseToJson(this);
+  Map<String, dynamic> toJson() => _$MovieListResponseToJson(this);
 }
