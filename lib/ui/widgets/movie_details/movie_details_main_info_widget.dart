@@ -180,12 +180,25 @@ class _TopPosterWidget extends StatelessWidget {
               ? Image.network(ApiClient.imageUrl(backdropPath))
               : const SizedBox.shrink(),
           Positioned(
-              top: 20,
-              left: 20,
-              bottom: 20,
-              child: posterPath != null
-                  ? Image.network(ApiClient.imageUrl(posterPath))
-                  : const SizedBox.shrink()),
+            top: 20,
+            left: 20,
+            bottom: 20,
+            child: posterPath != null
+                ? Image.network(ApiClient.imageUrl(posterPath))
+                : const SizedBox.shrink(),
+          ),
+          Positioned(
+            top: 10,
+            right: 10,
+            child: IconButton(
+              icon: Icon(
+                  _model?.isFavorite == true
+                      ? Icons.favorite
+                      : Icons.favorite_outline,
+                  color: Colors.white),
+              onPressed: () => _model?.toggleFavorite(),
+            ),
+          )
         ],
       ),
     );
@@ -287,8 +300,7 @@ class SummaryWidget extends StatelessWidget {
     final _releaseWhere = model.movieReleaseDates?.results
         .firstWhere((element) => element.iso == 'RU' || element.iso == 'US');
     final country = _releaseWhere?.iso;
-    final _releaseInfo =
-        _releaseWhere?.releaseDates.firstWhere((element) => element.type == 3);
+    final _releaseInfo = _releaseWhere?.releaseDates[0];
     final certification = _releaseInfo?.certification;
     final releaseDate = model.stringFromDate(_releaseInfo?.releaseDate);
     final runtime = movieDetails?.runtime ?? 0;
