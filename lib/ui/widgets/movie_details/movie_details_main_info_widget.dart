@@ -19,14 +19,7 @@ class MovieDetailsMainInfoWidget extends StatelessWidget {
         ),
         _ScoreWidget(),
         SummaryWidget(),
-        Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-            child: Text('From the author of Rainbow Six.',
-                style: TextStyle(
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w400,
-                    fontStyle: FontStyle.italic,
-                    fontSize: 17))),
+        _MovieTaglineWidget(),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
           child: _OverviewWidget(),
@@ -35,6 +28,29 @@ class MovieDetailsMainInfoWidget extends StatelessWidget {
         SizedBox(height: 30),
         _PeopleWidgets(),
       ],
+    );
+  }
+}
+
+class _MovieTaglineWidget extends StatelessWidget {
+  const _MovieTaglineWidget({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final _model = NotifierProvider.watch<MovieDetailsModel>(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+      child: Text(
+        _model?.movieDetails?.tagline ?? '',
+        style: const TextStyle(
+          color: Colors.grey,
+          fontWeight: FontWeight.w400,
+          fontStyle: FontStyle.italic,
+          fontSize: 17,
+        ),
+      ),
     );
   }
 }
@@ -117,11 +133,12 @@ class _DescriptionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-      child: Text(
-          'Коллеги и жена Джона Келли убиты. Чудом оставшийся в живых мужчина решает найти преступников и отомстить.',
-          style: TextStyle(color: Colors.white, fontSize: 16)),
+    final _model = NotifierProvider.watch<MovieDetailsModel>(context);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+      child: Text(_model?.movieDetails?.overview ?? '',
+          style: const TextStyle(color: Colors.white, fontSize: 16)),
     );
   }
 }
@@ -259,14 +276,25 @@ class SummaryWidget extends StatelessWidget {
         _releaseWhere?.releaseDates.firstWhere((element) => element.type == 3);
     final certification = _releaseInfo?.certification;
     final releaseDate = model.stringFromDate(_releaseInfo?.releaseDate);
-    final duration = movieDetails?.runtime;
-    final genres = movieDetails?.genres.toList().toString();
+    final runtime = movieDetails?.runtime ?? 0;
+    final hours = Duration(minutes: runtime).inHours;
+    final minutes = Duration(minutes: runtime).inMinutes.remainder(60);
+    final duration = '$hours ч $minutes мин';
+    final genres = movieDetails?.genres;
+    String genreString = '';
+    if (genres != null && genres.isNotEmpty) {
+      var genreList = <String>[];
+      for (var genre in genres) {
+        genreList.add(genre.name);
+      }
+      genreString = genreList.join(', ');
+    }
     return ColoredBox(
       color: const Color.fromRGBO(22, 21, 25, 1.0),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 70.0, vertical: 10.0),
         child: Text(
-          '$certification, $releaseDate ($country), $duration, $genres',
+          '$certification, $releaseDate ($country), $duration, $genreString',
           maxLines: 3,
           textAlign: TextAlign.center,
           style: const TextStyle(
