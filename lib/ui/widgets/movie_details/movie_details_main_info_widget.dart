@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:themoviedb/domain/api_client/api_client.dart';
+import 'package:themoviedb/domain/entity/movie_details_credits.dart';
 import 'package:themoviedb/library/widgets/inherited/provider.dart';
 import 'package:themoviedb/ui/widgets/elements/radial_percent_widget.dart';
 import 'package:themoviedb/ui/widgets/movie_details/movie_details_model.dart';
@@ -60,68 +61,73 @@ class _PeopleWidgets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const nameStyle = TextStyle(
-        color: Colors.white, fontWeight: FontWeight.bold, fontSize: 17);
-    const jobTitleStyle = TextStyle(
-        color: Colors.white, fontWeight: FontWeight.w400, fontSize: 17);
-    return Column(
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('Stefano Sollima', style: nameStyle),
-                  Text('Director', style: jobTitleStyle)
-                ],
-              ),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('Tom Clancy', style: nameStyle),
-                  Text('Novel', style: jobTitleStyle)
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('Taylor Sheridan', style: nameStyle),
-                  Text('Screenplay', style: jobTitleStyle)
-                ],
-              ),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('Will Staples', style: nameStyle),
-                  Text('Screenplay', style: jobTitleStyle)
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
+    final model = NotifierProvider.watch<MovieDetailsModel>(context);
+    if (model == null) return const SizedBox.shrink();
+    var _crew = model.movieDetails?.credits.crew;
+    if (_crew == null || _crew.isEmpty) return const SizedBox.shrink();
+    _crew = _crew.length > 4 ? _crew.sublist(0, 4) : _crew;
+    var _crewChunks = <List<Crew>>[];
+    for (var i = 0; i < _crew.length; i += 2) {
+      _crewChunks
+          .add(_crew.sublist(i, i + 2 > _crew.length ? _crew.length : i + 2));
+    }
+
+    return ListView.builder(
+        shrinkWrap: true,
+        itemCount: _crewChunks.length,
+        itemBuilder: (context, index) =>
+            _PeopleRowWidget(chunk: _crewChunks[index]));
+  }
+}
+
+class _PeopleRowWidget extends StatelessWidget {
+  final List<Crew> chunk;
+  const _PeopleRowWidget({Key? key, required this.chunk}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const SizedBox(width: 20),
+          _PeopleRowItemWidget(name: chunk[0].name, job: chunk[0].job),
+          const SizedBox(width: 20),
+          _PeopleRowItemWidget(name: chunk[1].name, job: chunk[1].job),
+        ],
+      ),
+      const SizedBox(height: 20),
+    ]);
+  }
+}
+
+class _PeopleRowItemWidget extends StatelessWidget {
+  final String name;
+  final String job;
+  const _PeopleRowItemWidget({Key? key, required this.name, required this.job})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    const _nameStyle = TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+      fontSize: 17,
+    );
+    const _jobTitleStyle = TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.w400,
+      fontSize: 17,
+    );
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(name, style: _nameStyle),
+          Text(job, style: _jobTitleStyle)
+        ],
+      ),
     );
   }
 }
