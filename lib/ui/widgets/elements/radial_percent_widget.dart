@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class RadialPercentWidget extends StatelessWidget {
   final Widget child;
   final double percent;
-  final Color fillColor;
+  final Color bgColor;
   final Color lineColor;
   final Color freeColor;
   final double lineWidth;
@@ -14,7 +14,7 @@ class RadialPercentWidget extends StatelessWidget {
       {Key? key,
       required this.child,
       required this.percent,
-      required this.fillColor,
+      required this.bgColor,
       required this.lineColor,
       required this.freeColor,
       required this.lineWidth})
@@ -27,7 +27,7 @@ class RadialPercentWidget extends StatelessWidget {
       children: [
         CustomPaint(
             painter: MyPainter(
-                fillColor: fillColor,
+                bgColor: bgColor,
                 freeColor: freeColor,
                 lineColor: lineColor,
                 lineWidth: lineWidth,
@@ -43,16 +43,16 @@ class RadialPercentWidget extends StatelessWidget {
 
 class MyPainter extends CustomPainter {
   final double percent;
-  final Color fillColor;
+  final Color bgColor;
   final Color lineColor;
   final Color freeColor;
   final double lineWidth;
 
   MyPainter({
     required this.percent,
-    required this.fillColor,
-    required this.lineColor,
-    required this.freeColor,
+    required this.bgColor,
+    required this.lineColor, // цвет заполнения
+    required this.freeColor, // остаток от заполнения
     required this.lineWidth,
   });
 
@@ -96,7 +96,7 @@ class MyPainter extends CustomPainter {
 
   void drawBackground(Canvas canvas, Size size) {
     final paint = Paint();
-    paint.color = fillColor;
+    paint.color = bgColor;
     paint.style = PaintingStyle.fill;
     canvas.drawOval(Offset.zero & size, paint);
   }

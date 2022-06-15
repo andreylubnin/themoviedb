@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:themoviedb/domain/entity/movie_details.dart';
 import 'package:themoviedb/domain/entity/movie_list_response.dart';
+import 'package:themoviedb/domain/entity/movie_release_dates.dart';
 
 enum ApiClientExceptionType { network, auth, other }
 
@@ -165,6 +166,23 @@ class ApiClient {
       <String, dynamic>{
         'api_key': _apiKey,
         'language': locale,
+      },
+    );
+    return result;
+  }
+
+  Future<MovieReleaseDates> movieReleaseDates(int movieId) async {
+    parser(dynamic json) {
+      final jsonMap = json as Map<String, dynamic>;
+      final response = MovieReleaseDates.fromJson(jsonMap);
+      return response;
+    }
+
+    final result = _get(
+      '/movie/$movieId/release_dates',
+      parser,
+      <String, dynamic>{
+        'api_key': _apiKey,
       },
     );
     return result;

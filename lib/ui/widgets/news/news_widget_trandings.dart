@@ -79,7 +79,7 @@ class _NewsWidgetTrandingsState extends State<NewsWidgetTrandings> {
                             height: 45,
                             child: RadialPercentWidget(
                               percent: 0.68,
-                              fillColor: Color.fromARGB(255, 10, 23, 25),
+                              bgColor: Color.fromARGB(255, 10, 23, 25),
                               lineColor: Color.fromARGB(255, 37, 203, 103),
                               freeColor: Color.fromARGB(255, 25, 54, 31),
                               lineWidth: 3,

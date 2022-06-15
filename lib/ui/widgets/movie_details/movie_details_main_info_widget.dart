@@ -200,10 +200,9 @@ class _ScoreWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var _voteAverage = NotifierProvider.watch<MovieDetailsModel>(context)
-            ?.movieDetails
-            ?.voteAverage ??
-        0;
+    final movieDetails =
+        NotifierProvider.watch<MovieDetailsModel>(context)?.movieDetails;
+    var _voteAverage = movieDetails?.voteAverage ?? 0;
     _voteAverage = _voteAverage * 10;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -217,15 +216,15 @@ class _ScoreWidget extends StatelessWidget {
                 height: 45,
                 child: RadialPercentWidget(
                     percent: _voteAverage / 100,
-                    fillColor: const Color.fromARGB(255, 10, 23, 25),
-                    freeColor: const Color.fromARGB(255, 37, 203, 103),
-                    lineColor: const Color.fromARGB(255, 25, 54, 31),
+                    bgColor: const Color.fromARGB(255, 10, 23, 25),
+                    lineColor: const Color.fromARGB(255, 37, 203, 103),
+                    freeColor: const Color.fromARGB(255, 25, 54, 31),
                     lineWidth: 3,
                     child: Text(_voteAverage.toStringAsFixed(0),
                         style: const TextStyle(color: Colors.white))),
               ),
               const SizedBox(width: 10),
-              const Text('User Score'),
+              const Text('Рейтинг'),
             ],
           ),
         ),
@@ -249,15 +248,28 @@ class SummaryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ColoredBox(
-      color: Color.fromRGBO(22, 21, 25, 1.0),
+    final model = NotifierProvider.watch<MovieDetailsModel>(context);
+    if (model == null) return const SizedBox.shrink();
+
+    final movieDetails = model.movieDetails;
+    final _releaseWhere = model.movieReleaseDates?.results
+        .firstWhere((element) => element.iso == 'RU' || element.iso == 'US');
+    final country = _releaseWhere?.iso;
+    final _releaseInfo =
+        _releaseWhere?.releaseDates.firstWhere((element) => element.type == 3);
+    final certification = _releaseInfo?.certification;
+    final releaseDate = model.stringFromDate(_releaseInfo?.releaseDate);
+    final duration = movieDetails?.runtime;
+    final genres = movieDetails?.genres.toList().toString();
+    return ColoredBox(
+      color: const Color.fromRGBO(22, 21, 25, 1.0),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 70.0, vertical: 10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 70.0, vertical: 10.0),
         child: Text(
-          'R, 29/04/2021 (US), 1h 49m, боевик, триллер',
+          '$certification, $releaseDate ($country), $duration, $genres',
           maxLines: 3,
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w400,
             fontSize: 16,
