@@ -5,16 +5,16 @@ import 'package:themoviedb/domain/entity/movie_details.dart';
 import 'package:themoviedb/domain/entity/movie_list_response.dart';
 import 'package:themoviedb/domain/entity/movie_release_dates.dart';
 
-enum ApiClientExceptionType { network, auth, other }
+enum ApiClientExceptionType { network, auth, other, sessionExpired }
 
-enum MediaType { Movie, TV }
+enum MediaType { movie, tv }
 
 extension MediaTypeAsString on MediaType {
   String asString() {
     switch (this) {
-      case MediaType.Movie:
+      case MediaType.movie:
         return 'movie';
-      case MediaType.TV:
+      case MediaType.tv:
         return 'tv';
     }
   }
@@ -92,9 +92,7 @@ class ApiClient {
       request.headers.contentType = ContentType.json;
       request.write(jsonEncode(bodyParameters));
       final response = await request.close();
-      if (response.statusCode == 201) {
-        return '1' as T;
-      }
+
       final dynamic json = (await response.jsonDecode());
       _validateResponse(response, json);
 
@@ -228,20 +226,20 @@ class ApiClient {
     return result;
   }
 
-  Future<String> markAsFavorite(
+  Future<int> markAsFavorite(
       {required int accountId,
       required String sessionId,
       required MediaType mediaType,
       required int mediaId,
       required bool isFavorite}) async {
     parser(dynamic json) {
-      return '1';
+      return 1;
     }
 
     final parameters = <String, dynamic>{
       'media_type': mediaType.asString(),
-      'media_id': mediaId.toString(),
-      'favorite': isFavorite.toString(),
+      'media_id': mediaId,
+      'favorite': isFavorite,
     };
     final result = _post(
       '/account/$accountId/favorite',
@@ -302,11 +300,12 @@ class ApiClient {
   Future<String> _makeSession({
     required String requestToken,
   }) async {
-    final parser = (dynamic json) {
+    parser(dynamic json) {
       final jsonMap = json as Map<String, dynamic>;
       final sessionId = jsonMap['session_id'] as String;
       return sessionId;
-    };
+    }
+
     final parameters = <String, dynamic>{
       'request_token': requestToken,
     };
@@ -326,6 +325,8 @@ class ApiClient {
       final code = status is int ? status : 0;
       if (code == 30 || code == 32) {
         throw ApiClientException(ApiClientExceptionType.auth);
+      } else if (code == 3) {
+        throw ApiClientException(ApiClientExceptionType.sessionExpired);
       } else {
         throw ApiClientException(ApiClientExceptionType.other);
       }

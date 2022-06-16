@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:themoviedb/domain/api_client/api_client.dart';
@@ -15,6 +17,7 @@ class MovieDetailsModel extends ChangeNotifier {
   bool _isFavorite = false;
   String _locale = '';
   late DateFormat _dateFormat;
+  Future<void>? Function()? onSessionExpired;
 
   MovieDetails? get movieDetails => _movieDetails;
   MovieReleaseDates? get movieReleaseDates => _movieReleaseDates;
@@ -35,13 +38,17 @@ class MovieDetailsModel extends ChangeNotifier {
   }
 
   Future<void> loadMovieDetails() async {
-    _movieDetails = await _apiClient.movieDetails(movieId, _locale);
-    _movieReleaseDates = await _apiClient.movieReleaseDates(movieId);
-    final sessionId = await _sessionDataProvider.getSessionId();
-    if (sessionId != null) {
-      _isFavorite = await _apiClient.isFavorite(movieId, sessionId);
+    try {
+      _movieDetails = await _apiClient.movieDetails(movieId, _locale);
+      _movieReleaseDates = await _apiClient.movieReleaseDates(movieId);
+      final sessionId = await _sessionDataProvider.getSessionId();
+      if (sessionId != null) {
+        _isFavorite = await _apiClient.isFavorite(movieId, sessionId);
+      }
+      notifyListeners();
+    } on ApiClientException catch (e) {
+      _handleApiClientException(e);
     }
-    notifyListeners();
   }
 
   Future<void> toggleFavorite() async {
@@ -57,12 +64,23 @@ class MovieDetailsModel extends ChangeNotifier {
       await _apiClient.markAsFavorite(
         accountId: accountId,
         sessionId: sessionId,
-        mediaType: MediaType.Movie,
+        mediaType: MediaType.movie,
         mediaId: movieId,
         isFavorite: _isFavorite,
       );
-    } catch (e) {
-      print(e);
+    } on ApiClientException catch (e) {
+      _handleApiClientException(e);
+    }
+  }
+
+  void _handleApiClientException(ApiClientException e) {
+    switch (e.type) {
+      case ApiClientExceptionType.sessionExpired:
+        onSessionExpired?.call();
+        break;
+      default:
+        log(e.toString());
+        break;
     }
   }
 }

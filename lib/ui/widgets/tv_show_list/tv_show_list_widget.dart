@@ -19,7 +19,7 @@ class TVShow {
 }
 
 class TVShowListWidget extends StatefulWidget {
-  TVShowListWidget({Key? key}) : super(key: key);
+  const TVShowListWidget({Key? key}) : super(key: key);
 
   @override
   _TVShowListWidgetState createState() => _TVShowListWidgetState();

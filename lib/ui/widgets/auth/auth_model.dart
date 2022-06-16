@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:themoviedb/domain/api_client/api_client.dart';
 import 'package:themoviedb/domain/data_providers/session_data_provider.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +48,9 @@ class AuthModel extends ChangeNotifier {
           break;
         case ApiClientExceptionType.other:
           _errorMessage = 'Что-то пошло не так. Попробуйте ещё раз';
+          break;
+        case ApiClientExceptionType.sessionExpired:
+          _errorMessage = 'Ошибка авторизации. Попробуйте ещё раз';
           break;
       }
     } catch (e) {
